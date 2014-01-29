@@ -60,15 +60,15 @@ imageUPTGCal = imtransform(imageUPGCal, mytrfUD, 'Xdata', [1 size(imageDWGCal,2)
 %figure(3); imshow(imageUPTGCal);
 % G-factor Map
 G = double(imageUPTGCal) ./ double(imageDWGCal);
-figure(4); imshow(G);
-figure(5); hist(G(:), [0.5:0.01:1.5]);
+%figure(4); imshow(G);
+%figure(5); hist(G(:), [0.5:0.01:1.5]);
 %%
 %figure(5); hist(double(imageUPTGCal(:)), 1000);
 %figure(6); hist(double(imageDWGCal(:)), 1000);
 
 % iDat = imread([myDirData, myFileData]);
 myiInfo = imfinfo([myDirData, myFileData], 'tif');  % Extract file headers and info
-numberOfFrames = numel(myiInfo);                   % Number of images in the tif
+numberOfFrames = numel(myiInfo);                    % Number of images in the tif
 
 if regexp(myFileData, '.fits$', 'start')
     iDat = flipud(iDat);
@@ -76,16 +76,16 @@ end
 %%
 sUPRed = uint16(zeros(size(imageUPGCal)));
 sDWRed = uint16(zeros(size(imageDWGCal)));
-
+%iUPSum = zeros(699,350,numberOfFrames);
 for lpFrames = 1:numberOfFrames
     % Work with small areas
     iDat = imread([myDirData, myFileData], 'tif', 'Index', lpFrames, 'Info', myiInfo);
     
     iUPDat = imcrop(iDat, areaUP);
     iDWDat = imcrop(iDat, areaDW);
-
-    iUPRed = iUPDat - 1500;
-    iDWRed = iDWDat - 1500;
+    iUPSum(:,:,lpFrames) = iUPDat;
+    iUPRed = iUPDat - 1800;
+    iDWRed = iDWDat - 1400;
     
     sUPRed = sUPRed + iUPRed;
     sDWRed = sDWRed + iDWRed;
@@ -93,5 +93,42 @@ for lpFrames = 1:numberOfFrames
     %figure(9); hist(double(iUPDat(:)), [50:20:30000]);
     %figure(10); hist(double(iDWDat(:)), 500);
 end
+%%
 figure(7); imshow(sUPRed);
-figure(8); imshow(sDWRed);
+%figure(8); imshow(sDWRed);
+
+%%
+B(1,:,1) = iUPSum(176,:,183);
+figure(8); plot(B(:));
+
+%%
+for x = 1:700
+    for z = 180:190
+        A(:,1,1) = iUPSum(:,x,z);
+       
+        fh = figure('Visible','off');
+        hist(A(:), [50:20:3000]);
+        saveas(fh, [ 'ice-plot/', 'h_', 'X', int2str(x), 'Ys', 'Z', int2str(z) ], 'png')
+        close(fh)
+        
+        fh2 = figure('Visible','off');
+        plot(A(:));
+        saveas(fh2, [ 'ice-plot/', 'p_', 'X', int2str(x), 'Ys', 'Z', int2str(z) ], 'png')
+        close(fh2)
+    end
+    C(:,1,:) = iUPSum(:,x,:);
+    
+    fh3 = figure('Visible','off');
+    imshow(C(:,:), [1000 7000]);
+    saveas(fh3, [ 'ice-plot/', 'd_', 'X', int2str(x), 'Ys', 'Zs' ], 'png')
+    close(fh3)
+end
+%%
+
+fh3 = figure('Visible','on');
+    imshow(C(:,:), [1000 7000]);
+%    saveas(fh3, [ 'ice-plot/', 'd_', 'X', int2str(309), 'Ys', 'Zs' ], 'tif')
+%    close(fh3)
+
+
+
