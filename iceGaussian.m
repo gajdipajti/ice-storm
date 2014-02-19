@@ -3,6 +3,7 @@ function [I] = iceGaussian(stack)
 %       - this must be from the real picture
 %       - the main script does the wrapping
 
+% Collected references:
 % www.exelisvis.com/docs/GAUSS2DFIT.html
 % http://jila.colorado.edu/bec/BEC_for_everyone/matlabfitting.htm
 % https://uqu.edu.sa/files2/tiny_mce/plugins/filemanager/files/4282164/Gaussian%20function.pdf

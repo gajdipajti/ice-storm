@@ -34,6 +34,7 @@ mapUPSum = zeros(351,700,250,'uint8');
 mapUPCount = zeros(351,700,'uint8');
 myZBegin=zeros('uint16');
 myZEnd=zeros('uint16');
+myZlimit=8;
 myZStack = zeros(1,4,'uint16');
 str=zeros(1,4,'uint16');
 % x=zeros('uint16');
@@ -53,7 +54,7 @@ for x = 1:700
                 end
             end
             if (z > 1)
-                if ((iUPSum(y,x,z) > 2000) && (mapUPSum(y,x,z-1) > 0))
+                if ((iUPSum(y,x,z) > 2000) && (mapZflag > 0))
                     mapUPSum(y,x,z) = mapUPSum(y,x,z) + 1;
                     mapUPCount(y,x) = mapUPCount(y,x) + 1;
                 end
@@ -61,7 +62,7 @@ for x = 1:700
                     % The end has been located
                     mapZflag=0;
                     myZEnd=cast(z, 'uint16');
-                    if ((myZEnd - myZBegin) > 2)
+                    if ((myZEnd - myZBegin) > myZlimit)
                         str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
                         myZStack = [myZStack; str]; 
                     end
@@ -70,7 +71,11 @@ for x = 1:700
         end
         if (mapZflag == 1)
             %End of stack, must be the end of the blink also
-            myZEnd=zEnd;
+            myZEnd=cast(zEnd, 'uint16');
+            if ((myZEnd - myZBegin) > myZlimit)
+               str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
+               myZStack = [myZStack; str]; 
+            end
         end
     end
 end

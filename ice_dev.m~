@@ -9,8 +9,8 @@ areaUP = [200 100 699 350];
 areaDW = [200 550 699 350];
 
 % An input file
-myHome     = '/home/freeman/';
-% myHome   = '/home/gajdost/';
+% myHome     = '/home/freeman/';
+myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
@@ -61,7 +61,7 @@ for x = 1:700
                     % The end has been located
                     mapZflag=0;
                     myZEnd=cast(z, 'uint16');
-                    if ((myZEnd - myZBegin) > 2)
+                    if ((myZEnd - myZBegin) > 8)
                         str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
                         myZStack = [myZStack; str]; 
                     end
@@ -77,5 +77,3 @@ end
 %% 
 A(1,1,:) = mapUPSum(176,339,:);
 plot(A(:));
-
-
