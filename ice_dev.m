@@ -9,8 +9,8 @@ areaUP = [200 100 699 350];
 areaDW = [200 550 699 350];
 
 % An input file
-myHome     = '/home/freeman/';
-% myHome   = '/home/gajdost/';
+% myHome     = '/home/freeman/';
+myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 

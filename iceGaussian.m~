@@ -1,5 +1,5 @@
 function [I] = iceGaussian(stack)
-% stack - first-2 and last-2 are considered backdround
+% stack - first-n and last-n are considered backdround
 %       - this must be from the real picture
 %       - the main script does the wrapping
 
@@ -17,11 +17,11 @@ function [I] = iceGaussian(stack)
 
 % check background
 % mean of a matrix is a vector
-SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
+SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint16');
 % case ??
 
 % Dummy Gauss fit - Riemann
 I = zeros(Sz,'uint32');
 for Si = 3:(Sz-2)
-    I(Si) = sum(stack(:,:,Si), 'uint32') - Sx*Sy*SMean;
+    I[i] = sum(stack(:,:,Si)
 end
