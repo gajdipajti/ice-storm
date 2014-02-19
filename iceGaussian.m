@@ -21,7 +21,7 @@ function [I] = iceGaussian(stack)
 SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
 % case ??
 
-% Dummy Gauss fit - Riemann
+% Dummy - Riemann
 I = zeros(Sz,'uint32');
 for Si = 3:(Sz-2)
     I(Si) = sum(stack(:,:,Si), 'uint32') - Sx*Sy*SMean;

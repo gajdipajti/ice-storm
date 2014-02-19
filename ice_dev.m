@@ -9,8 +9,8 @@ areaUP = [200 100 699 350];
 areaDW = [200 550 699 350];
 
 % An input file
-% myHome     = '/home/freeman/';
-myHome     = '/home/gajdost/';
+myHome     = '/home/freeman/';
+% myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
@@ -30,8 +30,8 @@ for lpFrames = 1:zEnd
 end
 %% Search Code
 % A code part where the pixel marker works.
-mapUPSum = zeros(351,700,250,'uint8');
-mapUPCount = zeros(351,700,'uint8');
+mapUPSum = zeros(351,700,250,'uint16');
+mapUPCount = zeros(351,700,'uint16');
 myZBegin=zeros('uint16');
 myZEnd=zeros('uint16');
 myZlimit=8;
@@ -79,6 +79,21 @@ for x = 1:700
         end
     end
 end
-%% 
+%% Max Value
+% http://www.mathworks.com/matlabcentral/answers/47428-to-find-the-maximum-value-in-a-matrix
+% http://www.mathworks.com/matlabcentral/newsreader/view_thread/269569
+mUPCount=mapUPCount;
+mFlag = 1;
+mLimit = 8;
+while mFlag >0
+    [mValue, idx] = max(mUPCount(:));
+    [mx my] = ind2sub(size(mUPCount),idx);
+    % iceCenter
+    mUPCount(mx,my)=0;
+    if mValue < mLimit
+        mFlag = 0;
+    end
+end   
+%%
 A(1,1,:) = mapUPSum(176,339,:);
 plot(A(:));
