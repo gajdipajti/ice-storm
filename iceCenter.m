@@ -1,4 +1,4 @@
-function [area] = iceCenter(coord)
+function [cdx, cdy, czb, cze] = iceCenter(cx, cy)
 
 % Ez egy durva közelítést ad a térképen, hogy mekkora kiterjedésű az adott
 % felvillanás xy-ban 3*3; 5*5; 7*7;

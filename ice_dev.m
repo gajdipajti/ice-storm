@@ -28,9 +28,11 @@ for lpFrames = 1:zEnd
     iUPDat = imcrop(iDat, areaUP);
     iUPSum(:,:,lpFrames) = iUPDat;
 end
+clear iDat;
+clear iUPDat;
 %% Search Code
 % A code part where the pixel marker works.
-mapUPSum = zeros(351,700,250,'uint16');
+mapUPSum = zeros(351,700,zEnd,'uint16');
 mapUPCount = zeros(351,700,'uint16');
 myZBegin=zeros('uint16');
 myZEnd=zeros('uint16');
@@ -85,14 +87,21 @@ end
 mUPCount=mapUPCount;
 mFlag = 1;
 mLimit = 8;
+mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
-    [mx my] = ind2sub(size(mUPCount),idx);
-    % iceCenter
+    [mx, my] = ind2sub(size(mUPCount),idx);
+    [dx, dy, zb, ze] = iceCenter(mx,my);
+    % 
+    % mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
+%    for mz = zb:ze
+%        mUPSum(my,mx,mz) = mG(mz); 
+%    end
     mUPCount(mx,my)=0;
     if mValue < mLimit
         mFlag = 0;
     end
+%    clear mG;
 end   
 %%
 A(1,1,:) = mapUPSum(176,339,:);

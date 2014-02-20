@@ -1,7 +1,8 @@
 function [I] = iceGaussian(stack)
-% stack - first-2 and last-2 are considered backdround
-%       - this must be from the real picture
-%       - the main script does the wrapping
+% stack -> first-2 and last-2 are considered backdround
+%       -> this must be from the real picture
+%       -> the main script must do the wrapping
+%       -> does not think about trajectories
 
 % Collected references:
 % www.exelisvis.com/docs/GAUSS2DFIT.html
@@ -10,8 +11,8 @@ function [I] = iceGaussian(stack)
 % http://www.weizmann.ac.il/home/eofek/matlab/FitFun/fit_gauss2d.m
 % http://www.igorexchange.com/node/1553
 
-% Gauss 2D illesztést csinál az adatokra, és visszaad egy függvény alatti
-% terület értéket.
+% Returns the volume under the 2D Gaussian.
+% Currently running in fake-Riemann mode.
 
 % Get the size of the stack
 [Sx,Sy,Sz] = size(stack);
@@ -20,6 +21,7 @@ function [I] = iceGaussian(stack)
 % mean of a matrix is a vector
 SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
 % case ??
+% -> for not matching backgrounds
 
 % Dummy - Riemann
 I = zeros(Sz,'uint32');
