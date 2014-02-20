@@ -12,7 +12,7 @@ for ci=1:size(myZStack,1)
         CZ = [ CZ; [ myZStack(ci,3), myZStack(ci,4) ] ];
         cflag = 1;
     else
-        % Did not match, possible noise cut out with myZlimit
+        % Did not match, possible noise
         [cflag, cdx, cdy, czb, cze] = zeros(5);
     end
 end

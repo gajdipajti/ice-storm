@@ -1,3 +1,7 @@
+%% Returns the volume under the 2D Gaussian.
+% Currently running in fake-Riemann mode.
+% author:  gajdost
+% package: ice-storm
 function [I] = iceGaussian(stack)
 % stack -> first-2 and last-2 are considered backdround
 %       -> this must be from the real picture
@@ -10,9 +14,6 @@ function [I] = iceGaussian(stack)
 % https://uqu.edu.sa/files2/tiny_mce/plugins/filemanager/files/4282164/Gaussian%20function.pdf
 % http://www.weizmann.ac.il/home/eofek/matlab/FitFun/fit_gauss2d.m
 % http://www.igorexchange.com/node/1553
-
-% Returns the volume under the 2D Gaussian.
-% Currently running in fake-Riemann mode.
 
 % Get the size of the stack
 [Sx,Sy,Sz] = size(stack);
