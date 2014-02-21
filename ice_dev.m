@@ -14,7 +14,7 @@ myHome     = '/home/freeman/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
-%Read in
+% Read in
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
 %%
@@ -30,7 +30,7 @@ for lpFrames = 1:zEnd
 end
 clear iDat;
 clear iUPDat;
-%% Search Code
+%% Search Code - pre-processer
 % A code part where the pixel marker works.
 mapUPSum = zeros(351,700,zEnd,'uint16');
 mapUPCount = zeros(351,700,'uint16');
@@ -39,7 +39,7 @@ myZEnd=zeros('uint16');
 myZlimit=8;
 myZStack = zeros(1,4,'uint16');
 str=zeros(1,4,'uint16');
-% x=zeros('uint16');
+% x=zeros('uint16'); % Not needed, and not working well
 % y=zeros('uint16');
 % z=zeros('uint16');
 for x = 1:700
@@ -91,9 +91,9 @@ mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx);
-    [ok, dx, dy, zb, ze] = iceCenter(mx,my);
-    % 
-    % mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
+%   [ok, dx, dy, zb, ze] = iceCenter(mx,my);
+% Some more stuff here.... TODO
+%   mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
 %    for mz = zb:ze
 %        mUPSum(my,mx,mz) = mG(mz); 
 %    end
@@ -103,6 +103,6 @@ while mFlag >0
     end
 %    clear mG;
 end   
-%%
+%% Just a data reader. Nothing fun here.
 A(1,1,:) = mapUPSum(176,339,:);
 plot(A(:));
