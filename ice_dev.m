@@ -36,7 +36,7 @@ mapUPSum = zeros(351,700,zEnd,'uint16');
 mapUPCount = zeros(351,700,'uint16');
 myZBegin=zeros('uint16');
 myZEnd=zeros('uint16');
-myZlimit=8;
+myZlimit=7;
 myZStack = zeros(1,4,'uint16');
 str=zeros(1,4,'uint16');
 % x=zeros('uint16'); % Not needed, and not working well
@@ -93,24 +93,51 @@ while mFlag >0
     [mx, my] = ind2sub(size(mUPCount),idx);
     [ok, dx, dy, zb, ze] = iceCenter(mx,my,myZStack);
     % 
-    % Clear area
     if (ok > 0)
+        % Generate indexes for sub
         xb=mx-dx;
         xe=mx+dx;
         yb=my-dy;
         ye=my+dy;
+        if zb < 2
+            % Must rework
+            bgs = 0;
+            tzb=zb;
+            tze=ze;
+        elseif zb < 3
+            bgs = 1;
+            tzb=zb-1;
+            tze=ze+1;
+        elseif ze > (zEnd-2)
+            % Needs reworking
+            bgs = 0;
+            tzb=zb;
+            tze=ze;
+        else
+            bgs = 2;
+            tzb=zb-2;
+            tze=ze+2;
+        end
+        if tze > zEnd
+            tze = zEnd;
+        end
+        % End generation
+        % Clear area, because iceCenter reported ok.
         for xi = xb:xe
             for yi = yb:ye
                 mUPCount(xi,yi) = 0;
             end
-        end % Clear Complete
-        mG = iceGaussian( iUPSum(xb:xe,yb:ye,zb:ze) );
+        end
+        % Clear Complete
+        mG = iceGaussian(bgs, iUPSum(xb:xe,yb:ye,tzb:tze) );
         for mz = zb:ze
-            mUPSum(my,mx,mz) = mG(mz); 
+            mUPSum(my,mx,mz) = mG(mz-(zb-1)); 
         end
     end
+    % Dump the max, it was no use.
     mUPCount(mx,my)=0;
     if mValue < mLimit
+        % Hurray limit reached!
         mFlag = 0;
     end
 %    clear mG;

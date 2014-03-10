@@ -32,9 +32,6 @@ for ci = 1:size(myZStack,1)
             zePuffer = myZStack(ci,4);
             ok = ok + 1;
         end
-    else
-        % Did not match, possible noise cut out with myZlimit
-        ok = 0;
     end
 end
 %
@@ -59,8 +56,8 @@ deltaZC = 0;
     for zci = 1:size(ZC,1)
         if (deltaZC < (ZC(zci,1) - ZC(zci,2)))
         deltaZC = (ZC(zci,1) - ZC(zci,2));
-        zb = ZC(zci,1)
-        ze = ZC(zci,2)
+        zb = ZC(zci,1);
+        ze = ZC(zci,2);
         end
     end
     

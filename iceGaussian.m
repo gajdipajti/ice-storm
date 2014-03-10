@@ -3,7 +3,7 @@
 % author:  gajdost
 % package: ice-storm
 % version: 0.d.1 % dummy
-function [I] = iceGaussian(stack)
+function [I] = iceGaussian(bgs, stack)
 % stack -> first-2 and last-2 are considered backdround
 %       -> this must be from the real picture
 %       -> the main script must do the wrapping
@@ -21,12 +21,30 @@ function [I] = iceGaussian(stack)
 
 % check background
 % mean of a matrix is a vector
-SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
-% case ??
-% -> for not matching backgrounds
+switch bgs
+    case 0
+        SMean = cast((mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/2, 'uint32');
+        dze = 0;
+        dzb = 0;
+    case 1
+        SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
+        dze = 1;
+        dzb = 1;
+    case 2
+        SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
+        dze = 2;
+        dzb = 2;
+    otherwise
+        SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stack(:,:,Sz-1))) + mean(mean(stack(:,:,Sz))))/4, 'uint32');
+        dze = 2;
+        dzb = 2;
+end
 
 % Dummy - Riemann
-I = zeros(Sz, 'uint32');
-for Si = 3:(Sz-2)
-    I(Si) = sum(sum(stack(:,:,Si))) - cast(Sx*Sy*SMean, 'uint32');
+for Si = (1+dzb):(Sz-dze)
+    smeany = Sx*Sy*SMean;
+    stacky = stack(:,:,Si);
+    sumy = sum(stacky);
+    summy = sum(sumy);
+    I(Si-dzb) = summy - smeany;
 end
