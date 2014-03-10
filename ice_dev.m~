@@ -94,20 +94,20 @@ while mFlag >0
     [ok, dx, dy, zb, ze] = iceCenter(mx,my,myZStack);
     % 
     % Clear area
-    if (ok > 0)
-        xb=mx-dx;
-        xe=mx+dx;
-        yb=my-dy;
-        ye=my+dy;
-        for xi = xb:xe
-            for yi = yb:ye
-                mUPCount(xi,yi) = 0;
-            end
-        end % Clear Complete
-        mG = iceGaussian( iUPSum(xb:xe,yb:ye,zb:ze) );
-        for mz = zb:ze
-            mUPSum(my,mx,mz) = mG(mz); 
+    
+    xb=mx-dx;
+    xe=mx+dx;
+    yb=my-dy;
+    ye=my+dy;
+    for xi = xb:xe
+        for yi = yb:ye
+           mUPCount(xi,yi) = 0;
         end
+    end % Clear Complete
+    tmpIUP = iUpSum(xb:xe,yb:ye,zb:ze);
+    mG = iceGaussian( tmpIUP );
+    for mz = zb:ze
+        mUPSum(my,mx,mz) = mG(mz); 
     end
     mUPCount(mx,my)=0;
     if mValue < mLimit

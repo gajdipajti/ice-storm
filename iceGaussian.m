@@ -2,6 +2,7 @@
 % Currently running in fake-Riemann mode.
 % author:  gajdost
 % package: ice-storm
+% version: 0.d.1 % dummy
 function [I] = iceGaussian(stack)
 % stack -> first-2 and last-2 are considered backdround
 %       -> this must be from the real picture
@@ -25,7 +26,7 @@ SMean = cast((mean(mean(stack(:,:,1))) + mean(mean(stack(:,:,2)))+mean(mean(stac
 % -> for not matching backgrounds
 
 % Dummy - Riemann
-I = zeros(Sz,'uint32');
+I = zeros(Sz, 'uint32');
 for Si = 3:(Sz-2)
-    I(Si) = sum(stack(:,:,Si), 'uint32') - Sx*Sy*SMean;
+    I(Si) = sum(sum(stack(:,:,Si))) - cast(Sx*Sy*SMean, 'uint32');
 end
