@@ -104,10 +104,10 @@ while mFlag >0
         end
     end % Clear Complete
     
-    % mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
-%    for mz = zb:ze
-%        mUPSum(my,mx,mz) = mG(mz); 
-%    end
+    mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
+    for mz = zb:ze
+        mUPSum(my,mx,mz) = mG(mz); 
+    end
     mUPCount(mx,my)=0;
     if mValue < mLimit
         mFlag = 0;

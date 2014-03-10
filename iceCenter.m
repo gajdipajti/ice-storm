@@ -37,17 +37,19 @@ for ci = 1:size(myZStack,1)
         ok = 0;
     end
 end
-ze = zePuffer; % Kiírás
-if (0 < ok < 2)
-    ZC = [zb, ze];
-else
-    ztmp = [zb ze];
-    ZC = [ZC; ztmp];
-end
-%
 %
 if (ok > 0)
-% Overlap check
+    % Last writeout
+    ze = zePuffer;
+    if (ok < 2)
+        ZC = [zb, ze];
+    else
+        ztmp = [zb ze];
+        ZC = [ZC; ztmp];
+    end
+    
+    
+    % Overlap check
     
 % Multi max check
 

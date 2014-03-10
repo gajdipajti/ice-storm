@@ -34,35 +34,36 @@ for ci = 1:size(myZStack,1)
         end
     else
         % Did not match, possible noise cut out with myZlimit
-%        ok = 
+        ok = 0;
     end
 end
-ze = zePuffer; % Kiírás
-if (ok < 2)
-    ZC = [zb, ze];
-else
-    ztmp = [zb ze];
-    ZC = [ZC; ztmp];
-end
-%
 %
 if (ok > 0)
-% Overlap check
+
+    
+    
+    % Overlap check
     
 % Multi max check
 
 % DEV::DeArray
 % Simplification
 deltaZC = 0;
-for zci = 1:size(ZC,1)
-    if (deltaZC < (ZC(zci,1) - ZC(zci,2)))
+    for zci = 1:size(ZC,1)
+        if (deltaZC < (ZC(zci,1) - ZC(zci,2)))
         deltaZC = (ZC(zci,1) - ZC(zci,2));
         zb = ZC(zci,1)
         ze = ZC(zci,2)
+        end
     end
-end
     
-% Return
-    dx = 2;
-    dy = 2;
+    % Return
+        dx = 2;
+        dy = 2;
+else
+    ok = 0;
+    dx = 0;
+    dy = 0;
+    zb = 0;
+    ze = 0;
 end
