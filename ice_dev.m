@@ -91,9 +91,20 @@ mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx);
-%   [ok, dx, dy, zb, ze] = iceCenter(mx,my);
-% Some more stuff here.... TODO
-%   mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
+    [ok, dx, dy, zb, ze] = iceCenter(mx,my,myZStack);
+    % 
+    % Clear area
+    xb=mx-dx;
+    xe=mx+dx;
+    yb=my-dy;
+    ye=my+dy;
+    for xi = xb:xe
+        for yi = yb:ye
+           mUPCount(xi,yi) = 0;
+        end
+    end % Clear Complete
+    
+    % mG = iceGaussian( iUpSum(xb:xe,yb:ye,zb:ze) );
 %    for mz = zb:ze
 %        mUPSum(my,mx,mz) = mG(mz); 
 %    end
