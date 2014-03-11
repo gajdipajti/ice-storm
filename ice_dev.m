@@ -9,8 +9,8 @@ areaUP = [200 100 699 350];
 areaDW = [200 550 699 350];
 
 % An input file
-% myHome     = '/home/freeman/';
-myHome     = '/home/gajdost/';
+myHome     = '/home/freeman/';
+% myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
@@ -20,7 +20,7 @@ numberOfFrames = numel(myiInfo);                            % Number of images i
 %%
 iUPSum = zeros(351,700,200,'uint16');
 %zEnd=249;
-zEnd=480;
+zEnd=249;
 %for lpFrames = 1:numberOfFrames
 for lpFrames = 1:zEnd
     % Work with small areas
@@ -82,7 +82,8 @@ for x = 1:700
         end
     end
 end
-%% Max Value
+%% Max Value and fit
+% Implement me: Missing G calculations
 % http://www.mathworks.com/matlabcentral/answers/47428-to-find-the-maximum-value-in-a-matrix
 % http://www.mathworks.com/matlabcentral/newsreader/view_thread/269569
 mUPCount=mapUPCount;
@@ -92,10 +93,12 @@ mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
-    istack(:,1,1) = iUPSum(mx,my,:);
-    [ok, dx, dy, zb, ze] = iceCenter(mx, my, myZStack, istack);
-    % 
+    [ok, dx, dy, zb, ze] = iceCenter(mx, my, myZStack);
+    % Only run if iceCenter reported success.
     if (ok > 0)
+        % Do a data plot from the full ZStack(R)
+        istack(:,1,1) = iUPSum(mx,my,:);
+        iceStackPlot(mx,my,istack);
         % Generate indexes for sub
         xb=mx-dx;
         xe=mx+dx;
@@ -124,14 +127,20 @@ while mFlag >0
             tze = zEnd;
         end
         % End generation
+        %
         % Clear area, because iceCenter reported ok.
+        % Overlapping PSF warning!
         for xi = xb:xe
             for yi = yb:ye
                 mUPCount(xi,yi) = 0;
             end
         end
         % Clear Complete
+        %
+        % Do the plot.
+        % Please implement more gaussian fit+volume calculators
         mG = iceGaussian(bgs, iUPSum(xb:xe,yb:ye,tzb:tze) );
+        % Plot done
         for mz = zb:ze
             mUPSum(my,mx,mz) = mG(mz-(zb-1)); 
         end
@@ -145,7 +154,6 @@ while mFlag >0
 %    clear mG;
 end   
 %% Just a data reader. Nothing fun here.
-clear A;
 %A(1,1,:) = iUPSum(176,339,:);
 A(1,1,:) = iUPSum(248,528,:);
 plot(A(:));

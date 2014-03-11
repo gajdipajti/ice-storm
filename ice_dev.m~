@@ -20,7 +20,7 @@ numberOfFrames = numel(myiInfo);                            % Number of images i
 %%
 iUPSum = zeros(351,700,200,'uint16');
 %zEnd=249;
-zEnd=;
+zEnd=480;
 %for lpFrames = 1:numberOfFrames
 for lpFrames = 1:zEnd
     % Work with small areas
@@ -91,10 +91,12 @@ mLimit = 8;
 mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
-    [mx, my] = ind2sub(size(mUPCount),idx);
-    [ok, dx, dy, zb, ze] = iceCenter(mx,my,myZStack);
+    [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
+    istack(:,1,1) = iUPSum(mx,my,:);
+    [ok, dx, dy, zb, ze] = iceCenter(mx, my, myZStack);
     % 
     if (ok > 0)
+        % Do a data plot from the full ZStack(R)
         % Generate indexes for sub
         xb=mx-dx;
         xe=mx+dx;
@@ -144,5 +146,7 @@ while mFlag >0
 %    clear mG;
 end   
 %% Just a data reader. Nothing fun here.
-A(1,1,:) = mapUPSum(176,339,:);
+clear A;
+%A(1,1,:) = iUPSum(176,339,:);
+A(1,1,:) = iUPSum(248,528,:);
 plot(A(:));
