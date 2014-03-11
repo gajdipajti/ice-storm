@@ -1,6 +1,6 @@
 % Anisotropy scan
 % Author:   gajdost
-% Version:  0.0.2-dev
+% Version:  0.a.3-dev
 
 % Area selection %
 % In this part you can select a crop size
@@ -17,7 +17,6 @@ myFileData = 'test1_a2_stack.tif';
 % Read in
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
-clear myiInfo;
 %%
 iUPSum = zeros(351,700,200,'uint16');
 zEnd=249;
@@ -32,6 +31,7 @@ for lpFrames = 1:zEnd
 end
 clear iDat;
 clear iUPDat;
+clear myiInfo;
 %% Search Code - pre-processer
 % A code part where the pixel marker works.
 mapUPSum = zeros(351,700,zEnd,'uint16');
@@ -152,12 +152,19 @@ while mFlag >0
         % Hurray limit reached!
         mFlag = 0;
     end
-%    clear mG;
+    clear mG;
 end
 clear iUPSum;
+clear mapUPSum;
+clear mUPCount;
+clear mapUPCount;
 %% Create a map
-for cx 
-
+mapFitData = zeros(351,700,'uint32');
+for cx = 1:700
+    for cy = 1:351
+        mapFitData(cy,cx) = sum(mUPSum(cy,cx,:));
+    end
+end
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
 A(1,1,:) = iUPSum(248,528,:);
