@@ -17,10 +17,11 @@ myFileData = 'test1_a2_stack.tif';
 % Read in
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
+clear myiInfo;
 %%
 iUPSum = zeros(351,700,200,'uint16');
-%zEnd=249;
 zEnd=249;
+%zEnd=499;
 %for lpFrames = 1:numberOfFrames
 for lpFrames = 1:zEnd
     % Work with small areas
@@ -37,7 +38,7 @@ mapUPSum = zeros(351,700,zEnd,'uint16');
 mapUPCount = zeros(351,700,'uint16');
 myZBegin=zeros('uint16');
 myZEnd=zeros('uint16');
-myZlimit=7;
+myZlimit=6;
 myZStack = zeros(1,4,'uint16');
 str=zeros(1,4,'uint16');
 % x=zeros('uint16'); % Not needed, and not working well
@@ -89,7 +90,7 @@ end
 mUPCount=mapUPCount;
 mFlag = 1;
 mLimit = 8;
-mUPSum = zeros(351,700,zEnd,'uint32');
+%mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
@@ -152,7 +153,11 @@ while mFlag >0
         mFlag = 0;
     end
 %    clear mG;
-end   
+end
+clear iUPSum;
+%% Create a map
+for cx 
+
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
 A(1,1,:) = iUPSum(248,528,:);
