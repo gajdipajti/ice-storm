@@ -1,6 +1,6 @@
 % Anisotropy scan
 % Author:   gajdost
-% Version:  0.0.2-dev
+% Version:  0.a.3-dev
 
 % Area selection %
 % In this part you can select a crop size
@@ -31,6 +31,7 @@ for lpFrames = 1:zEnd
 end
 clear iDat;
 clear iUPDat;
+clear myiInfo;
 %% Search Code - pre-processer
 % A code part where the pixel marker works.
 mapUPSum = zeros(351,700,zEnd,'uint16');
@@ -66,7 +67,7 @@ for x = 1:700
                     mapZflag=0;
                     myZEnd=cast(z, 'uint16');
                     if ((myZEnd - myZBegin) > myZlimit)
-                        str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
+                        str = [ cast(x, 'uint16') cast(y, 'uint16') myZBegin myZEnd ];
                         myZStack = [myZStack; str]; 
                     end
                 end
@@ -76,7 +77,7 @@ for x = 1:700
             %End of stack, must be the end of the blink also
             myZEnd=cast(zEnd, 'uint16');
             if ((myZEnd - myZBegin) > myZlimit)
-               str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
+               str = [ cast(x, 'uint16') cast(y, 'uint16') myZBegin myZEnd ];
                myZStack = [myZStack; str]; 
             end
         end
@@ -89,7 +90,7 @@ end
 mUPCount=mapUPCount;
 mFlag = 1;
 mLimit = 8;
-%mUPSum = zeros(351,700,zEnd,'uint32');
+mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
@@ -153,18 +154,18 @@ while mFlag >0
     end
     clear mG;
 end
-clear iUPSum;
-clear mapUPSum;
+%clear iUPSum;
+%clear mapUPSum;
 clear mUPCount;
-clear mapUPCount;
 %% Create a map
-mapFitData = zeros(351,700,'uint32');
+mapFitData = zeros(351,700,'double');
 for cx = 1:700
     for cy = 1:351
-        mapFitData(cy,cx) = sum(mUPSum(cy,cx,:));
+        mapFitData(cy,cx) = cast(sum(mUPSum(cy,cx,:)), 'double');
     end
 end
+imshow(mapFitData);
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
-A(1,1,:) = iUPSum(248,528,:);
-plot(A(:));
+%A(1,1,:) = iUPSum(248,528,:);
+%plot(A(:));

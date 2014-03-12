@@ -90,7 +90,7 @@ end
 mUPCount=mapUPCount;
 mFlag = 1;
 mLimit = 8;
-%mUPSum = zeros(351,700,zEnd,'uint32');
+mUPSum = zeros(351,700,zEnd,'uint32');
 while mFlag >0
     [mValue, idx] = max(mUPCount(:));
     [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
@@ -143,7 +143,7 @@ while mFlag >0
         mG = iceGaussian(bgs, iUPSum(xb:xe,yb:ye,tzb:tze) );
         % Plot done
         for mz = zb:ze
-            mUPSum(my,mx,mz) = mG(mz-(zb-1)); 
+            mUPSum(mx,my,mz) = mG(mz-(zb-1)); 
         end
     end
     % Dump the max, it was no use.
@@ -154,18 +154,18 @@ while mFlag >0
     end
     clear mG;
 end
-clear iUPSum;
-clear mapUPSum;
+%clear iUPSum;
+%clear mapUPSum;
 clear mUPCount;
-clear mapUPCount;
 %% Create a map
-mapFitData = zeros(351,700,'uint32');
+mapFitData = zeros(351,700,'double');
 for cx = 1:700
     for cy = 1:351
-        mapFitData(cy,cx) = sum(mUPSum(cy,cx,:));
+        mapFitData(cy,cx) = cast(sum(mUPSum(cy,cx,:)), 'double');
     end
 end
+imshow(mapFitData);
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
-A(1,1,:) = iUPSum(248,528,:);
-plot(A(:));
+%A(1,1,:) = iUPSum(248,528,:);
+%plot(A(:));
