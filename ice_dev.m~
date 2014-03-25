@@ -5,22 +5,41 @@
 % Area selection %
 % In this part you can select a crop size
 % This is a simple split
-areaUP = [200 100 699 350];
-areaDW = [200 550 699 350];
+areaUP = [200 100 699 350]; % rotated, in focus
+areaDW = [200 550 699 350]; % normal, out of focus
 
 % An input file
 myHome     = '/home/freeman/';
-% myHome     = '/home/gajdost/';
+%myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
+% The registration
+myDirReg  = '/home/freeman/Dropbox/Munka/adoptim/Diplomamunka/2013_05_30_refData/Calibration_Today/';
+myFileReg = 'Cal_fluroscein_10mM_10ms_1emg_100f_r1.tif';
+iReg = imread([myDirReg, myFileReg]);
+imReg = flipud(iReg);
+irUP = imcrop(imReg, areaUP);
+irDW = imcrop(imReg, areaDW);
+cpselect(irUP, irDW);
+%%
+% http://www.mathworks.com/help/images/ref/cp2tform.html
+% http://www.mathworks.com/help/images/ref/tformfwd.html
+
+input_points = [89.4067524115756 297.168274383708;161.432475884244 303.170418006431;427.777599142551 305.421221864952;629.599678456592 317.425509110397;548.570739549839 31.5734190782422;52.6436227224009 33.0739549839228;229.706859592712 24.0707395498392;42.1398713826367 298.668810289389];
+base_points = [95.4088960342980 298.668810289389;168.935155412647 303.170418006431;433.029474812433 299.419078242229;631.850482315112 304.670953912112;547.070203644159 24.8210075026795;53.3938906752412 36.8252947481243;227.456055734191 24.8210075026795;51.1430868167203 303.920685959271];
+mytform = cp2tform(input_points, base_points, 'projective');
+itDW = imtransform(irDW, mytform, 'Xdata', [1 size(irDW,2)], 'Ydata', [1 size(irDW,1)] );
+imshow(itDW);
+%%
 % Read in
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
 %%
-iUPSum = zeros(351,700,200,'uint16');
 zEnd=249;
-%zEnd=499;
+iUPSum = zeros(351,700,zEnd,'uint16');
+iDWSum = zeros(351,700,zEnd,'uint16');
+
 %for lpFrames = 1:numberOfFrames
 for lpFrames = 1:zEnd
     % Work with small areas
@@ -28,143 +47,30 @@ for lpFrames = 1:zEnd
     
     iUPDat = imcrop(iDat, areaUP);
     iUPSum(:,:,lpFrames) = iUPDat;
+    iDWDat = imcrop(iDat, areaDW);
+    iDWSum(:,:,lpFrames) = iDWDat;
 end
-clear iDat;
-clear iUPDat;
-clear myiInfo;
+%%
+imshow(iDat);
+%clear myiInfo;
 %% Search Code - pre-processer
 % A code part where the pixel marker works.
-mapUPSum = zeros(351,700,zEnd,'uint16');
-mapUPCount = zeros(351,700,'uint16');
-myZBegin=zeros('uint16');
-myZEnd=zeros('uint16');
-myZlimit=6;
-myZStack = zeros(1,4,'uint16');
-str=zeros(1,4,'uint16');
-% x=zeros('uint16'); % Not needed, and not working well
-% y=zeros('uint16');
-% z=zeros('uint16');
-for x = 1:700
-    for y = 1:351
-        mapZflag=0;
-        for z = 1:zEnd
-            if (iUPSum(y,x,z) > 2500)
-                % The first hit is not counted to the global.
-                mapUPSum(y,x,z) = mapUPSum(y,x,z) + 1;
-                if (mapZflag == 0)
-                    % First match
-                    mapZflag = 1;
-                    myZBegin=cast(z, 'uint16');
-                end
-            end
-            if (z > 1)
-                if ((iUPSum(y,x,z) > 2000) && (mapZflag > 0))
-                    mapUPSum(y,x,z) = mapUPSum(y,x,z) + 1;
-                    mapUPCount(y,x) = mapUPCount(y,x) + 1;
-                end
-                if ((mapZflag == 1) && (mapUPSum(y,x,z) < 1))
-                    % The end has been located
-                    mapZflag=0;
-                    myZEnd=cast(z, 'uint16');
-                    if ((myZEnd - myZBegin) > myZlimit)
-                        str = [ cast(x, 'uint16') cast(y, 'uint16') myZBegin myZEnd ];
-                        myZStack = [myZStack; str]; 
-                    end
-                end
-            end
-        end
-        if (mapZflag == 1)
-            %End of stack, must be the end of the blink also
-            myZEnd=cast(zEnd, 'uint16');
-            if ((myZEnd - myZBegin) > myZlimit)
-               str = [ cast(x, 'uint16') cast(y, 'uint16') myZBegin myZEnd ];
-               myZStack = [myZStack; str]; 
-            end
-        end
-    end
-end
-%% Max Value and fit
-% Implement me: Missing G calculations
-% http://www.mathworks.com/matlabcentral/answers/47428-to-find-the-maximum-value-in-a-matrix
-% http://www.mathworks.com/matlabcentral/newsreader/view_thread/269569
-mUPCount=mapUPCount;
-mFlag = 1;
-mLimit = 8;
-mUPSum = zeros(351,700,zEnd,'uint32');
-while mFlag >0
-    [mValue, idx] = max(mUPCount(:));
-    [mx, my] = ind2sub(size(mUPCount),idx); % Please note here the dimension chande mx<->mx
-    [ok, dx, dy, zb, ze] = iceCenter(mx, my, myZStack);
-    % Only run if iceCenter reported success.
-    if (ok > 0)
-        % Do a data plot from the full ZStack(R)
-        istack(:,1,1) = iUPSum(mx,my,:);
-        iceStackPlot(mx,my,istack);
-        % Generate indexes for sub
-        xb=mx-dx;
-        xe=mx+dx;
-        yb=my-dy;
-        ye=my+dy;
-        if zb < 2
-            % Must rework
-            bgs = 0;
-            tzb=zb;
-            tze=ze;
-        elseif zb < 3
-            bgs = 1;
-            tzb=zb-1;
-            tze=ze+1;
-        elseif ze > (zEnd-2)
-            % Needs reworking
-            bgs = 0;
-            tzb=zb;
-            tze=ze;
-        else
-            bgs = 2;
-            tzb=zb-2;
-            tze=ze+2;
-        end
-        if tze > zEnd
-            tze = zEnd;
-        end
-        % End generation
-        %
-        % Clear area, because iceCenter reported ok.
-        % Overlapping PSF warning!
-        for xi = xb:xe
-            for yi = yb:ye
-                mUPCount(xi,yi) = 0;
-            end
-        end
-        % Clear Complete
-        %
-        % Do the plot.
-        % Please implement more gaussian fit+volume calculators
-        mG = iceGaussian(bgs, iUPSum(xb:xe,yb:ye,tzb:tze) );
-        % Plot done
-        for mz = zb:ze
-            mUPSum(my,mx,mz) = mG(mz-(zb-1)); 
-        end
-    end
-    % Dump the max, it was no use.
-    mUPCount(mx,my)=0;
-    if mValue < mLimit
-        % Hurray limit reached!
-        mFlag = 0;
-    end
-    clear mG;
-end
-%clear iUPSum;
-%clear mapUPSum;
-clear mUPCount;
-%% Create a map
+[mUP, mUPXYZZ] = iceAnalysis(iUPSum,2300,1900,zEnd,6,7);
+[mDW, mDWXYZZ] = iceAnalysis(iDWSum,2300,1900,zEnd,6,7);
+% Two cubes are retured, which include the intensity data.
+%% Create a maps
 mapFitData = zeros(351,700,'double');
 for cx = 1:700
     for cy = 1:351
-        mapFitData(cy,cx) = cast(sum(mUPSum(cy,cx,:)), 'double');
+        mDWSum(cy,cx) = cast(sum(mDW(cy,cx,:)), 'double');
+        mUPSum(cy,cx) = cast(sum(mUP(cy,cx,:)), 'double');
     end
 end
-imshow(mapFitData);
+imwrite(mUPSum,'mUPSum.tif','Compression','none','WriteMode','append')
+imwrite(mDWSum,'mDWSum.tif','Compression','none','WriteMode','append')
+itUPSum = imtransform(mUPSum, mytform, 'Xdata', [1 size(mapFitData,2)], 'Ydata', [1 size(mapFitData,1)] );
+imwrite(itUPSum,'mtUPSum.tif','Compression','none','WriteMode','append')
+imshow(itUPSum);
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
 %A(1,1,:) = iUPSum(248,528,:);
