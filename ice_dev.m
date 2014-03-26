@@ -114,6 +114,8 @@ while maximus > 0
     tye= uint16(ty) + deltaLOCY;
     
     % Find the matching needle on the carpet.
+    % This solution must be upstreamed to solve the workaround in
+    % iceAnalysis
     ij = 1;
     PosPair = zeros(1,4,'uint16');
     for itx = txb:txe

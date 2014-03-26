@@ -114,14 +114,16 @@ while maximus > 0
     tye= uint16(ty) + deltaLOCY;
     
     % Find the matching needle on the carpet.
+    % This solution must be upstreamed to solve 
     ij = 1;
     PosPair = zeros(1,4,'uint16');
     for itx = txb:txe
         for ity = tyb:tye
             if mTRFSum(ity, itx) > 0
-                
+                % Possible pairs
+                %               FOUND Y_X - TRF Y_X
                 PosPair(ij,:) = [ ity itx ty tx ]
-	ij = ij + 1;
+                ij = ij + 1;
             end
         end
     end
