@@ -79,7 +79,8 @@ imwrite(mtUPSum,'mtUPSum.tif','Compression','none','WriteMode','append')
 % Get maximus, as before.
 % Set limit here.
 maximus = 1;
-deltaLOC = 10;
+deltaLOCX = 5;
+deltaLOCY = 3;
 mTMPSum = mUPSum;
 mTMP = mUP;
 mTRFSum = mDWSum;
@@ -107,19 +108,20 @@ while maximus > 0
     end
     % This will need a wrapper for multi-blinks
     [tx, ty] = tformfwd(myTFORM, bx, by);
-    txb= uint16(tx) - deltaLOC;
-    txe= uint16(tx) + deltaLOC;
-    tyb= uint16(ty) - deltaLOC;
-    tye= uint16(ty) + deltaLOC;
+    txb= uint16(tx) - deltaLOCX;
+    txe= uint16(tx) + deltaLOCX;
+    tyb= uint16(ty) - deltaLOCY;
+    tye= uint16(ty) + deltaLOCY;
     
     % Find the matching needle on the carpet.
     ij = 1;
-    PosPair = zeros(1,2,'uint16');
+    PosPair = zeros(1,4,'uint16');
     for itx = txb:txe
         for ity = tyb:tye
             if mTRFSum(ity, itx) > 0
-               PosPair(ij,:) = [ ity itx ];
-               ij = ij + 1;
+                
+                PosPair(ij,:) = [ ity itx ty tx ]
+	ij = ij + 1;
             end
         end
     end
