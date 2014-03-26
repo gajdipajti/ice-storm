@@ -42,10 +42,10 @@ for ci = 1:size(locZStack,1)
             lzb = locZStack(ci,3);
             zePuffer = locZStack(ci,4);
             lok = lok + 1;
-        elseif ((locZStack(ci,3)-zePuffer) < 2)
+        elseif ((locZStack(ci,3)-zePuffer) < 2) % Needs checking
             zePuffer = locZStack(ci,4);
         else
-            lze = zePuffer; % Kiírás
+            lze = zePuffer; % Writeout
             if (lok < 2)
                 ZC = [lzb, lze];
             else

@@ -1,12 +1,13 @@
 % Anisotropy scan
 % Author:   gajdost
-% Version:  0.a.3-dev
+% package: ice-storm
+% Version:  0.a.4-dev
 
 % Area selection %
 % In this part you can select a crop size
 % This is a simple split
-areaUP = [200 100 699 350]; % rotated, in focus
-areaDW = [200 550 699 350]; % normal, out of focus
+areaUP = [200 100 699 350]; % normal, out of focus
+areaDW = [200 550 699 350]; % rotated, in focus
 
 % An input file
 myHome     = '/home/freeman/';
@@ -28,8 +29,8 @@ cpselect(irUP, irDW);
 
 input_points = [89.4067524115756 297.168274383708;161.432475884244 303.170418006431;427.777599142551 305.421221864952;629.599678456592 317.425509110397;548.570739549839 31.5734190782422;52.6436227224009 33.0739549839228;229.706859592712 24.0707395498392;42.1398713826367 298.668810289389];
 base_points = [95.4088960342980 298.668810289389;168.935155412647 303.170418006431;433.029474812433 299.419078242229;631.850482315112 304.670953912112;547.070203644159 24.8210075026795;53.3938906752412 36.8252947481243;227.456055734191 24.8210075026795;51.1430868167203 303.920685959271];
-mytform = cp2tform(input_points, base_points, 'projective');
-itDW = imtransform(irDW, mytform, 'Xdata', [1 size(irDW,2)], 'Ydata', [1 size(irDW,1)] );
+myTFORM = cp2tform(input_points, base_points, 'projective');
+itDW = imtransform(irDW, myTFORM, 'Xdata', [1 size(irDW,2)], 'Ydata', [1 size(irDW,1)] );
 imshow(itDW);
 %%
 % Read in
@@ -51,7 +52,7 @@ for lpFrames = 1:zEnd
     iDWSum(:,:,lpFrames) = iDWDat;
 end
 %%
-imshow(iDat);
+%imshow(iDat);
 %clear myiInfo;
 %% Search Code - pre-processer
 % A code part where the pixel marker works.
@@ -59,18 +60,84 @@ imshow(iDat);
 [mDW, mDWXYZZ] = iceAnalysis(iDWSum,2300,1900,zEnd,6,7);
 % Two cubes are retured, which include the intensity data.
 %% Create a maps
-mapFitData = zeros(351,700,'double');
+mDWSum = zeros(351,700,'double');
+mUPSum = zeros(351,700,'double');
 for cx = 1:700
     for cy = 1:351
         mDWSum(cy,cx) = cast(sum(mDW(cy,cx,:)), 'double');
         mUPSum(cy,cx) = cast(sum(mUP(cy,cx,:)), 'double');
     end
 end
-imwrite(mUPSum,'mUPSum.tif','Compression','none','WriteMode','append')
-imwrite(mDWSum,'mDWSum.tif','Compression','none','WriteMode','append')
-itUPSum = imtransform(mUPSum, mytform, 'Xdata', [1 size(mapFitData,2)], 'Ydata', [1 size(mapFitData,1)] );
-imwrite(itUPSum,'mtUPSum.tif','Compression','none','WriteMode','append')
-imshow(itUPSum);
+imwrite(mUPSum,'mUPSum.tif','Compression','none','WriteMode','append');
+imwrite(mDWSum,'mDWSum.tif','Compression','none','WriteMode','append');
+mtUPSum = imtransform(mUPSum, myTFORM, 'Xdata', [1 size(mUPSum,2)], 'Ydata', [1 size(mUPSum,1)] );
+imwrite(mtUPSum,'mtUPSum.tif','Compression','none','WriteMode','append')
+%imshow(mtUPSum);
+%imshow(mDWSum);
+
+%% Match blinks
+% Get maximus, as before.
+% Set limit here.
+maximus = 1;
+deltaLOC = 10;
+mTMPSum = mUPSum;
+mTMP = mUP;
+mTRFSum = mDWSum;
+mTRF = mDW;
+while maximus > 0
+    [bValue, idb] = max(mTMPSum(:));
+    [by, bx] = ind2sub(size(mTMPSum),idb); %Possible dim change??? %FIXME%
+
+%    iceStackPlot(bx,by,mTMP(by,bx,:),'ice-summed/');
+    % As there is no background, this will work just fine and the XYZbZe stuff is left out.
+    % This way it is cleaner.
+    bZb = 0;
+    bZe = 0;
+    for bz = 1:zEnd
+        if mTMP(by,bx,bz) > 0
+            if bZb == 0
+                bZb = bz;
+            end
+        else
+            if ((bZb > 0) && (bZe == 0))
+                bZe = bz-1;
+                % Add here store 'n' reset code, to analyse multi blinks.
+            end
+        end
+    end
+    % This will need a wrapper for multi-blinks
+    [tx, ty] = tformfwd(myTFORM, bx, by);
+    txb= uint16(tx) - deltaLOC;
+    txe= uint16(tx) + deltaLOC;
+    tyb= uint16(ty) - deltaLOC;
+    tye= uint16(ty) + deltaLOC;
+    
+    % Find the matching needle on the carpet.
+    ij = 1;
+    PosPair = zeros(1,2,'uint16');
+    for itx = txb:txe
+        for ity = tyb:tye
+            if mTRFSum(ity, itx) > 0
+               PosPair(ij,:) = [ ity itx ];
+               ij = ij + 1;
+            end
+        end
+    end
+    % Eval findings
+    
+    
+    % There is nothing to be seen here, move along...
+    mTMPSum(by,bx)=0; % Remove the found maximum.
+    
+    %
+%    undef PosPair;
+    % This will leave nobody behind, as there is no value between 1000 and 1, only zeroes.
+    if bValue < 10000
+       maximus = 0;
+    end
+end
+
+
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(176,339,:);
 %A(1,1,:) = iUPSum(248,528,:);

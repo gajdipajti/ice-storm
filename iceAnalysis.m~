@@ -39,7 +39,8 @@ for x = 1:700
                     myZEnd=cast(z, 'uint16');
                     if ((myZEnd - myZBegin) > myZlimit)
                         str = [ cast(y, 'uint16') cast(x, 'uint16') myZBegin myZEnd ];
-                        myZStack = [myZStack; str]; 
+                        myZStack(ijS,:) = [myZStack; str]; 
+                        ijS
                     end
                 end
             end
