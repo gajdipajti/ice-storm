@@ -22,7 +22,7 @@ iReg = imread([myDirReg, myFileReg]);
 imReg = flipud(iReg);
 irUP = imcrop(imReg, areaUP);
 irDW = imcrop(imReg, areaDW);
-cpselect(irUP, irDW);
+%cpselect(irUP, irDW);
 %%
 % http://www.mathworks.com/help/images/ref/cp2tform.html
 % http://www.mathworks.com/help/images/ref/tformfwd.html
