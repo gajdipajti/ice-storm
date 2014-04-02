@@ -92,20 +92,7 @@ while maximus > 0
 %    iceStackPlot(bx,by,mTMP(by,bx,:),'ice-summed/');
     % As there is no background, this will work just fine and the XYZbZe stuff is left out.
     % This way it is cleaner.
-    bZb = 0;
-    bZe = 0;
-    for bz = 1:zEnd
-        if mTMP(by,bx,bz) > 0
-            if bZb == 0
-                bZb = bz;
-            end
-        else
-            if ((bZb > 0) && (bZe == 0))
-                bZe = bz-1;
-                % Add here store 'n' reset code, to analyse multi blinks.
-            end
-        end
-    end
+%    [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
     % This will need a wrapper for multi-blinks
     [tx, ty] = tformfwd(myTFORM, bx, by);
     txb= uint16(tx) - deltaLOCX;
@@ -124,6 +111,9 @@ while maximus > 0
                 % Possible pairs
                 %               FOUND Y_X - TRF Y_X
                 PosPair(ij,:) = [ ity itx ty tx ]
+                [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
+                [tZb, tZe] = iceZZ(mTRF(ity,itx,:),zEnd);
+                Pairs = [ bZb bZe tZb tZe  ]
                 ij = ij + 1;
             end
         end
