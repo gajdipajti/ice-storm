@@ -37,7 +37,7 @@ imshow(itDW);
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
 %%
-zEnd=249;
+zEnd=299;
 iUPSum = zeros(351,700,zEnd,'uint16');
 iDWSum = zeros(351,700,zEnd,'uint16');
 
@@ -85,6 +85,9 @@ mTMPSum = mUPSum;
 mTMP = mUP;
 mTRFSum = mDWSum;
 mTRF = mDW;
+% Store the end picture here.
+iceCube = zeros(351,700,zEnd,'double');
+G = 1;  % This is another short circuit FIXME %
 while maximus > 0
     [bValue, idb] = max(mTMPSum(:));
     [by, bx] = ind2sub(size(mTMPSum),idb); %Possible dim change??? %FIXME%
@@ -148,6 +151,15 @@ while maximus > 0
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % Do the Harlem Shake, but on ice.
+    % https://www.youtube.com/watch?v=A8MVyY3N0Cc
+    if preDeltaZ > 0  
+        for iZ = matchZb:matchZe    %VECTORIZE FIXME%
+            POL1 = mTMP(by, bx, iZ);
+            POL2 = mTRF(matchY, matchX, iZ);
+            r = ((POL1 - G*POL2) / (POL1 + 2*G*POL2)); %FIXME%
+            iceCube(by,bx,iZ) = r;
+        end
+    end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % There is nothing to be seen here, move along...

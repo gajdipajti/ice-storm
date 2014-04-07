@@ -85,6 +85,9 @@ mTMPSum = mUPSum;
 mTMP = mUP;
 mTRFSum = mDWSum;
 mTRF = mDW;
+% Store the end picture here.
+iceCube = zeros(351,700,zEnd,'double');
+G = 1;  % This is another short circuit FIXME %
 while maximus > 0
     [bValue, idb] = max(mTMPSum(:));
     [by, bx] = ind2sub(size(mTMPSum),idb); %Possible dim change??? %FIXME%
@@ -132,12 +135,12 @@ while maximus > 0
                     % Classify the pairs with deltaZ.
                     % The longer the segment, the better the match
                     if preDeltaZ < deltaZ
+                        % Store the better fit.
                         preDeltaZ = deltaZ;
                         matchY = ity;
                         matchX = itx;
                         matchZb= mZb;
-                        m
-                        
+                        matchZe= mZe;
                     end
                 end
                 PosPair(ij,:) = [ ity itx ty tx ];
@@ -146,14 +149,24 @@ while maximus > 0
             end
         end
     end
-    % Eval findings
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    % Do the Harlem Shake, but on ice.
+    % https://www.youtube.com/watch?v=A8MVyY3N0Cc
+    if deltaZ > 0  
+        for iZ = matchZb:matchZe    %VECTORIZE FIXME%
+            POL1 = mTMP(by, bx, iZ);
+            POL2 = mTRF(matchY, matchX, iZ);
+            r = (POL1 - G*POL2) / (POL1 + 2*G*POL2); %FIXME%
+            iceCube(by,bx,iZ
+        end
+    end
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.
     
-    %
-%    undef PosPair;
+
+%   undef PosPair;
     % This will leave nobody behind, as there is no value between 1000 and 1, only zeroes.
     if bValue < 10000
        maximus = 0;
