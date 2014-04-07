@@ -22,7 +22,7 @@ iReg = imread([myHome, myDirReg, myFileReg]);
 imReg = flipud(iReg);
 irUP = imcrop(imReg, areaUP);
 irDW = imcrop(imReg, areaDW);
-%cpselect(irUP, irDW);
+cpselect(irUP, irDW);
 %%
 % http://www.mathworks.com/help/images/ref/cp2tform.html
 % http://www.mathworks.com/help/images/ref/tformfwd.html
@@ -37,7 +37,7 @@ imshow(itDW);
 myiInfo = imfinfo([myHome, myWorkDir, myFileData], 'tif');  % Extract file headers and info
 numberOfFrames = numel(myiInfo);                            % Number of images in the tif
 %%
-zEnd=249;
+zEnd=299;
 iUPSum = zeros(351,700,zEnd,'uint16');
 iDWSum = zeros(351,700,zEnd,'uint16');
 
@@ -152,20 +152,18 @@ while maximus > 0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % Do the Harlem Shake, but on ice.
     % https://www.youtube.com/watch?v=A8MVyY3N0Cc
-    if deltaZ > 0  
+    if preDeltaZ > 0  
         for iZ = matchZb:matchZe    %VECTORIZE FIXME%
             POL1 = mTMP(by, bx, iZ);
             POL2 = mTRF(matchY, matchX, iZ);
-            r = (POL1 - G*POL2) / (POL1 + 2*G*POL2); %FIXME%
-            iceCube(by,bx,iZ
+            r = ((POL1 - G*POL2) / (POL1 + 2*G*POL2)); %FIXME%
+            iceCube(by,bx,iZ) = r;
         end
-    end
-    
+    end  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.
     
-
 %   undef PosPair;
     % This will leave nobody behind, as there is no value between 1000 and 1, only zeroes.
     if bValue < 10000
