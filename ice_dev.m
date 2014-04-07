@@ -159,13 +159,11 @@ while maximus > 0
             r = ((POL1 - G*POL2) / (POL1 + 2*G*POL2)); %FIXME%
             iceCube(by,bx,iZ) = r;
         end
-    end
-    
+    end  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.
     
-
 %   undef PosPair;
     % This will leave nobody behind, as there is no value between 1000 and 1, only zeroes.
     if bValue < 10000
