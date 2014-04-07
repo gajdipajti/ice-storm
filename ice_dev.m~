@@ -114,25 +114,40 @@ while maximus > 0
     % iceAnalysis
     ij = 1;
     PosPair = zeros(1,4,'uint16');
+    % Clear preDeltaZ
+    preDeltaZ = 0;
+    deltaZ = 0;
     for itx = txb:txe
         for ity = tyb:tye
             if mTRFSum(ity, itx) > 0
                 % Possible pairs
                 %               FOUND Y_X - TRF Y_X
-                PosPair(ij,:) = [ ity itx ty tx ];
                 [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
                 [tZb, tZe] = iceZZ(mTRF(ity,itx,:),zEnd);
+                if ((tZb < bZe) && (bZb < tZe))
+                    % Valid match, only when there is a "segment > 0"
+                    mZb = max(bZb, tZb);
+                    mZe = min(bZe, tZe);
+                    deltaZ = mZe - mZb;
+                    % Classify the pairs with deltaZ.
+                    % The longer the segment, the better the match
+                    if preDeltaZ < deltaZ
+                        preDeltaZ = deltaZ;
+                        matchY = ity;
+                        matchX = itx;
+                        matchZb= mZb;
+                        m
+                        
+                    end
+                end
+                PosPair(ij,:) = [ ity itx ty tx ];
                 Pairs = [ bZb bZe tZb tZe  ];
                 ij = ij + 1;
             end
         end
     end
     % Eval findings
-    if (tZb < bZe) && (bZb < tZe)
-        mZb = max(bZb, tZb);
-        mZe = min(bZe, tZe);
-        deltaZ = mZe - mZb;
-    end
+
     
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.

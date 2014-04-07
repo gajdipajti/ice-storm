@@ -114,6 +114,9 @@ while maximus > 0
     % iceAnalysis
     ij = 1;
     PosPair = zeros(1,4,'uint16');
+    % Clear preDeltaZ
+    preDeltaZ = 0;
+    deltaZ = 0;
     for itx = txb:txe
         for ity = tyb:tye
             if mTRFSum(ity, itx) > 0
@@ -126,6 +129,16 @@ while maximus > 0
                     mZb = max(bZb, tZb);
                     mZe = min(bZe, tZe);
                     deltaZ = mZe - mZb;
+                    % Classify the pairs with deltaZ.
+                    % The longer the segment, the better the match
+                    if preDeltaZ < deltaZ
+                        % Store the better fit.
+                        preDeltaZ = deltaZ;
+                        matchY = ity;
+                        matchX = itx;
+                        matchZb= mZb;
+                        matchZe= mZe;
+                    end
                 end
                 PosPair(ij,:) = [ ity itx ty tx ];
                 Pairs = [ bZb bZe tZb tZe  ];
@@ -133,14 +146,15 @@ while maximus > 0
             end
         end
     end
-    % Eval findings
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    % Do the Harlem Shake, but on ice.
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.
     
-    %
-%    undef PosPair;
+
+%   undef PosPair;
     % This will leave nobody behind, as there is no value between 1000 and 1, only zeroes.
     if bValue < 10000
        maximus = 0;
