@@ -10,15 +10,15 @@ areaUP = [200 100 699 350]; % normal, out of focus
 areaDW = [200 550 699 350]; % rotated, in focus
 
 % An input file
-myHome     = '/home/freeman/';
-%myHome     = '/home/gajdost/';
+%myHome     = '/home/freeman/';
+myHome     = '/home/gajdost/';
 myWorkDir  = 'munka/adoptim/2013_05_30_GFPAnisData/';
 myFileData = 'test1_a2_stack.tif';
 
 % The registration
-myDirReg  = '/home/freeman/Dropbox/Munka/adoptim/Diplomamunka/2013_05_30_refData/Calibration_Today/';
+myDirReg  = 'Dropbox/Munka/adoptim/Diplomamunka/2013_05_30_refData/Calibration_Today/';
 myFileReg = 'Cal_fluroscein_10mM_10ms_1emg_100f_r1.tif';
-iReg = imread([myDirReg, myFileReg]);
+iReg = imread([myHome, myDirReg, myFileReg]);
 imReg = flipud(iReg);
 irUP = imcrop(imReg, areaUP);
 irDW = imcrop(imReg, areaDW);
@@ -89,6 +89,15 @@ while maximus > 0
     [bValue, idb] = max(mTMPSum(:));
     [by, bx] = ind2sub(size(mTMPSum),idb); %Possible dim change??? %FIXME%
 
+% OFF: https://www.youtube.com/watch?v=CLXt3yh2g0s
+%   And now you're gonna FIX ME
+%   I know you're gonna FIX ME
+%   I guarantee you'll FIX ME'cause you changed the way of data parsin'.
+
+%   Our array feels wrong please revert it back
+%   Our transform feels wrong can't hide the cracks
+%   I guarantee you'll miss me 'cause you changed the way of data parsin'.
+
 %    iceStackPlot(bx,by,mTMP(by,bx,:),'ice-summed/');
     % As there is no background, this will work just fine and the XYZbZe stuff is left out.
     % This way it is cleaner.
@@ -110,16 +119,22 @@ while maximus > 0
             if mTRFSum(ity, itx) > 0
                 % Possible pairs
                 %               FOUND Y_X - TRF Y_X
-                PosPair(ij,:) = [ ity itx ty tx ]
                 [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
                 [tZb, tZe] = iceZZ(mTRF(ity,itx,:),zEnd);
-                Pairs = [ bZb bZe tZb tZe  ]
+                if ((tZb < bZe) && (bZb < tZe))
+                    % Valid match, only when there is a "segment > 0"
+                    mZb = max(bZb, tZb);
+                    mZe = min(bZe, tZe);
+                    deltaZ = mZe - mZb;
+                end
+                PosPair(ij,:) = [ ity itx ty tx ];
+                Pairs = [ bZb bZe tZb tZe  ];
                 ij = ij + 1;
             end
         end
     end
     % Eval findings
-    
+
     
     % There is nothing to be seen here, move along...
     mTMPSum(by,bx)=0; % Remove the found maximum.
