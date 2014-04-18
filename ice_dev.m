@@ -74,7 +74,15 @@ mtUPSum = imtransform(mUPSum, myTFORM, 'Xdata', [1 size(mUPSum,2)], 'Ydata', [1 
 imwrite(mtUPSum,'mtUPSum.tif','Compression','none','WriteMode','append')
 %imshow(mtUPSum);
 %imshow(mDWSum);
-
+%%
+hotUP = zeros(700,zEnd,351,'uint32');
+hotDW = zeros(700,zEnd,351,'uint32');
+for hotx = 1:700
+    for hoty = 1:351
+            hotUP(hotx,:,hoty) = mUP(hoty,hotx,:);
+            hotDW(hotx,:,hoty) = mDW(hoty,hotx,:);
+    end
+end
 %% Match blinks
 % Get maximus, as before.
 % Set limit here.
