@@ -4,7 +4,7 @@
 % package: ice-storm
 % license: GPLv2
 % version: 0.d.1 % dummy
-function [mUPSum, myZStack] = iceAnalysis(iSum, upperTrigger, lowerTrigger, zEnd, myZlimit, mLimit)
+function [mUPSum, myZStack] = iceAnalysis(iSum, upperTrigger, lowerTrigger, zEnd, myZlimit, mLimit, localGCal)
 
 mapUPSum = zeros(351,700,zEnd,'uint16');
 mapUPCount = zeros(351,700,'uint16');
@@ -110,7 +110,7 @@ while mFlag >0
         %
         % Do the plot.
         % Please implement more gaussian fit+volume calculators
-        mG = iceGaussian(bgs, iSum(xb:xe,yb:ye,tzb:tze) );
+        mG = iceGaussian(localGCal(xb:xe,yb:ye), bgs, iSum(xb:xe,yb:ye,tzb:tze) );
         % Plot done
         for mz = zb:ze
             mUPSum(mx,my,mz) = mG(mz-(zb-1)); 

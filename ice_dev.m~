@@ -121,7 +121,7 @@ while maximus > 0
     % This way it is cleaner.
 %    [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
     % This will need a wrapper for multi-blinks
-    [ty, tx] = tformfwd(myTFORM, by, bx);
+    [tx, ty] = tformfwd(myTFORM, bx, by);
     txb= uint16(tx) - deltaLOCX;
     txe= uint16(tx) + deltaLOCX;
     tyb= uint16(ty) - deltaLOCY;
@@ -189,6 +189,6 @@ end
 
 %% Just a data reader. Nothing fun here.
 %A(1,1,:) = iUPSum(181,340,:);
-[aaax, aaay] = tformfwd(myTFORM, 176, 339)
+[aaax, aaay] = tformfwd(myTFORM, 181, 340)
 %A(1,1,:) = iUPSum(aaay,aaax,:);
 %plot(A(:));

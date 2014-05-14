@@ -5,7 +5,7 @@
 % license: GPLv2
 % version: 0.d.1 % dummy
 
-function [I] = iceGaussian(bg, stack)
+function [I] = iceGaussian(lgc, bg, stack)
 % stack -> first-[0,1,2] and last-[0,1,2] are considered backdround
 %       -> this must be from the real picture
 %       -> the main script must do the wrapping
@@ -53,7 +53,7 @@ end
 % TODO>>implement the gaussian way.
 for Si = (1+dzb):(Sz-dze)
     smeany = Sx*Sy*SMean;
-    stacky = stack(:,:,Si);
+    stacky = double(stack(:,:,Si)) .* double(lgc);
     sumy = sum(stacky);
     summy = sum(sumy);
     I(Si-dzb) = summy - smeany;
