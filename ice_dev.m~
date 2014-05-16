@@ -101,7 +101,7 @@ mTMP = mUP;
 mTRFSum = mDWSum;
 mTRF = mDW;
 % Store the end picture here.
-iceCube = zeros(351,700,zEnd,'double');
+iceCube = zeros(351,700,zEnd,'single');
 
 while maximus > 0
     [bValue, idb] = max(mTMPSum(:));
@@ -121,7 +121,7 @@ while maximus > 0
     % This way it is cleaner.
 %    [bZb, bZe] = iceZZ(mTMP(by,bx,:),zEnd);
     % This will need a wrapper for multi-blinks
-    [tx, ty] = tformfwd(myTFORM, bx, by);
+    [ty, tx] = tformfwd(myTFORM, by, bx);
     txb= uint16(tx) - deltaLOCX;
     txe= uint16(tx) + deltaLOCX;
     tyb= uint16(ty) - deltaLOCY;
@@ -159,7 +159,7 @@ while maximus > 0
                     end
                 end
                 PosPair(ij,:) = [ ity itx ty tx ];
-                Pairs = [ bZb bZe tZb tZe  ];
+                Pairs = [ bZb bZe tZb tZe ];
                 ij = ij + 1;
             end
         end
@@ -169,8 +169,8 @@ while maximus > 0
     % https://www.youtube.com/watch?v=A8MVyY3N0Cc
     if preDeltaZ > 0  
         for iZ = matchZb:matchZe    %VECTORIZE FIXME%
-            POL1 = mTMP(by, bx, iZ);
-            POL2 = mTRF(matchY, matchX, iZ);
+            POL2 = single(mTMP(by, bx, iZ));
+            POL1 = single(mTRF(matchY, matchX, iZ));
             r = ((POL1 - POL2) / (POL1 + 2*POL2)); %FIXME%
             iceCube(by,bx,iZ) = r;
         end
@@ -185,10 +185,78 @@ while maximus > 0
        maximus = 0;
     end
 end
+%%
+% Histogram plot
+icer = iceCube(:);
+iced = icer(icer ~= 0);
+figure(10);
+hist(iced, -0.5:0.1:1);
 
+%% File writeout
+%for x = 1:700
+%     for z = 1:zEnd;
+%         A(:,1,1) = iUPSum(:,x,z);
+%        
+%         fh = figure('Visible','off');
+%         hist(A(:), [50:20:3000]);
+%         saveas(fh, [ 'ice-plot/', 'h_', 'X', int2str(x), 'Ys', 'Z', int2str(z) ], 'png')
+%         close(fh)
+%         
+%         fh2 = figure('Visible','off');
+%         plot(A(:));
+%         saveas(fh2, [ 'ice-plot/', 'p_', 'X', int2str(x), 'Ys', 'Z', int2str(z) ], 'png')
+%         close(fh2)
+%     end
+%     C(:,1,:) = iceCube(:,x,:);
+%     
+%     fh3 = figure('Visible','off');
+%     imshow(C(:,:), [1000 7000]);
+%     saveas(fh3, [ 'ice-plot/', 'd_', 'X', int2str(x), 'Ys', 'Zs' ], 'png')
+%     close(fh3)
+% end
+%% Create a map
+% Move all to the beginning.
+% http://stackoverflow.com/questions/5488504/matlab-remove-leading-and-trailing-zeros-from-a-vector
+rj = 1;
+for rx = 1:700
+    for ry = 1:351
+        mRFlat(ry,rx) = cast(sum(iceCube(ry,rx,:)), 'single');
+        mRtemp(1,1,:) = iceCube(ry,rx,:);
+        mRtempvec = mRtemp(:);
+        
+        rzb = find(mRtempvec, 1, 'first');
+        rze = find(mRtempvec, 1, 'last');
+        if (rze - rzb) > 0
+            vRtemp = mRtempvec( rzb:rze);
+            rzt =  reshape(vRtemp,1,1,(rze-rzb+1) );
+            for ri = 1:(rze-rzb+1)
+                mRTime(ry,rx,ri) = rzt(ri);
+                lRTime(ri,rj)=rzt(ri);
+            end
+            mRavg(ry,rx)=mean(vRtemp);
+            lRavg(rj)=mean(vRtemp);
+            tRavg(rj,:)=[ rx ry rze-rzb+1 mean(vRtemp) std(vRtemp)];
+            rj= rj +1;
+        end
+    end
+end
 
-%% Just a data reader. Nothing fun here.
-%A(1,1,:) = iUPSum(181,340,:);
-[aaax, aaay] = tformfwd(myTFORM, 181, 340)
-%A(1,1,:) = iUPSum(aaay,aaax,:);
-%plot(A(:));
+%%
+
+ravg = mRavg(:);
+ravc = ravg(ravg ~= 0);
+figure(11);
+hist(lRavg(:), -0.5:0.1:1);
+
+%%
+A=(mRTime(176,339,1:20));
+B=(mRTime(181,340,1:20));
+rA=A(:);
+rB=B(:);
+plot(A(:));
+% %% Just a data reader. Nothing fun here.
+% A(:,1,:) = iceCube(:,340,:);
+% %[aaax, aaay] = tformfwd(myTFORM, 176, 339)
+% %A(1,1,:) = iUPSum(aaay,aaax,:);
+% fh3 = figure('Visible','on');
+% imshow(A(:,:), [-1 1]);
